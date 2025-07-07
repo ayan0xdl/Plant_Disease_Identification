@@ -1,27 +1,56 @@
-# main_streamlit.py
 import streamlit as st
 import requests
 
 st.set_page_config(page_title="🌿 Plant Disease Detector", layout="centered")
 
-st.title("🌿Plant Disease Recognition ")
+# --- Initialize session state ---
+if "menu" not in st.session_state:
+    st.session_state.menu = "Disease Detection"  # Default view
 
-menu = st.sidebar.selectbox("Select View", ["About", "Disease Detection"])
+# --- Sidebar Navigation ---
+menu_options = ["About", "Disease Detection", "BotaniQ"]
+selected = st.sidebar.selectbox(
+    "Select View",
+    menu_options,
+    index=menu_options.index(st.session_state.menu)
+)
+st.session_state.menu = selected
 
-if menu == "About":
+# --- ABOUT PAGE ---
+if st.session_state.menu == "About":
+    st.image("https://images.wallpaperscraft.com/image/single/leaves_plant_green_118405_1280x720.jpg")
     st.markdown("""
-    ## 🌿 Welcome!
-    This app identifies plant diseases from leaf images and suggests treatments using Gemini.
+    ## 🌿 Welcome to BotaniQ - Your Smart Plant Doctor
 
-    **Tech Stack:**
-    - TensorFlow 2.x for disease classification
-    - Gemini (via FastAPI backend) for treatment recommendations
-    - Streamlit for frontend
+    Ever worried about unusual spots or patches on your plant leaves?  
+    **BotaniQ** is here to help! This intelligent assistant detects plant diseases from leaf images and provides clear, actionable treatment suggestions — instantly.
 
-    **Author:** Ayan (GitHub: [Lighting-pixel](https://github.com/Lighting-pixel))
+    ---
+
+    ### 🔧 How It Works:
+    - 📷 **Upload a Leaf Image** – Just a simple click!
+    - 🧠 **AI-Powered Diagnosis** – Our model classifies the disease using deep learning.
+    - 💬 **BotaniQ Recommends** – Get curated treatment advice via conversational chat.
+
+    ---
+
+    ### 🛠️ Tech Stack:
+    - **TensorFlow 2.x** – For robust image classification  
+    - **FastAPI + Gemini** – Backend brain for intelligent conversation  
+    - **Streamlit** – Clean, interactive, and beautiful user interface  
+
+    ---
+
+    ### 👤 Author:
+    Built with 💚 by **Ayan**  
+    GitHub: [ayan0xdl](https://github.com/ayan0xdl)
     """)
 
-elif menu == "Disease Detection":
+
+# --- DISEASE DETECTION PAGE ---
+elif st.session_state.menu == "Disease Detection":
+    st.title("🌿 Plant Disease Recognition")
+
     uploaded_file = st.file_uploader("Upload a leaf image", type=["jpg", "png", "jpeg"])
 
     if uploaded_file:
@@ -35,13 +64,72 @@ elif menu == "Disease Detection":
             disease = result["disease"]
             confidence = round(result["confidence"] * 100, 2)
 
+            st.session_state["last_disease"] = disease  # Save for use in BotaniQ
+
         st.success(f"🩺 Predicted: **{disease}** ({confidence}%)")
 
-        if st.button("💡 Learn more from Gemini"):
-            with st.spinner("Gemini is thinking..."):
-                response = requests.post("http://localhost:8000/gemini_disease_info", json={"disease": disease})
-                advice = response.json().get("reply", "❌ Couldn’t fetch Gemini’s response.")
+        if st.button("💬 Ask BotaniQ"):
+            st.session_state.menu = "BotaniQ"
+            st.rerun()
 
-            st.markdown("### 🌿 Gemini's Advice")
-            st.markdown(f"<div style='background:#e8f5e9;padding:15px;border-left:4px solid #4CAF50;border-radius:5px; color:black;'>{advice}</div>", unsafe_allow_html=True)
+# --- BOTANIQ PAGE ---
+elif st.session_state.menu == "BotaniQ":
+    st.markdown("## 🤖 Meet BotaniQ — Your Plant Health Expert")
+    st.info("BotaniQ can help you understand the disease, suggest treatment, and guide future prevention.")
 
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
+    default_prompt = f"What should I know about {st.session_state.last_disease}?" if "last_disease" in st.session_state else ""
+
+    user_input = st.text_input("You:", value=default_prompt, key="input")
+
+    if st.button("Send"):
+        if user_input.strip() != "":
+            st.session_state.chat_history.append(("user", user_input))
+
+            with st.spinner("BotaniQ is thinking..."):
+                response = requests.post("http://localhost:8000/gemini_disease_info", json={"query": user_input,},timeout=10)
+                bot_reply = response.json().get("reply", "❌ Couldn’t fetch BotaniQ's response.")
+
+            st.session_state.chat_history.append(("bot", bot_reply))
+
+    # Scrollable and styled chat history
+    with st.container():
+        st.markdown(
+            """
+            <style>
+            .chat-box {
+                max-height: 400px;
+                overflow-y: auto;
+                padding-right: 10px;
+            }
+            </style>
+            <div class='chat-box'>
+            """,
+            unsafe_allow_html=True
+        )
+
+        for role, msg in st.session_state.chat_history:
+            if role == "user":
+                st.markdown(
+                    f"""
+
+                        <strong>You:</strong><br>{msg}
+                    
+                    """,
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    f"""
+                        <strong>BotaniQ:</strong><br>{msg}
+
+                    """,
+                    unsafe_allow_html=True
+                )
+
+        #auto scrolling
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div id='dummy_scroll'></div>", unsafe_allow_html=True)
+        st.markdown("<script>document.getElementById('dummy_scroll').scrollIntoView();</script>", unsafe_allow_html=True)

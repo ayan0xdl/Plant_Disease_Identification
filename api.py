@@ -29,11 +29,11 @@ def predict(file: UploadFile = File(...)):
     return {"disease": label, "confidence": confidence}
 
 
-class DiseaseRequest(BaseModel):
-    disease: str
+class QueryRequest(BaseModel):
+    query: str
 
 @app.post("/gemini_disease_info")
-def gemini_disease_info(data: DiseaseRequest):
-    reply = explain_disease(data.disease)
+def gemini_disease_info(data: QueryRequest):
+    reply = explain_disease(data.query)
     return {"reply": reply}
 
