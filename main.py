@@ -62,11 +62,10 @@ elif st.session_state.menu == "Disease Detection":
             result = response.json()
 
             disease = result["disease"]
-            confidence = round(result["confidence"] * 100, 2)
 
             st.session_state["last_disease"] = disease  # Save for use in BotaniQ
 
-        st.success(f"🩺 Predicted: **{disease}** ({confidence}%)")
+        st.success(f"🩺 Predicted: **{disease}**")
 
         if st.button("💬 Ask BotaniQ"):
             st.session_state.menu = "BotaniQ"
@@ -74,7 +73,7 @@ elif st.session_state.menu == "Disease Detection":
 
 # --- BOTANIQ PAGE ---
 elif st.session_state.menu == "BotaniQ":
-    st.markdown("## 🤖 Meet BotaniQ — Your Plant Health Expert")
+    st.markdown("### Chat with BotaniQ")
     st.info("BotaniQ can help you understand the disease, suggest treatment, and guide future prevention.")
 
     if "chat_history" not in st.session_state:
