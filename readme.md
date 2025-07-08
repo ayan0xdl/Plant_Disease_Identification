@@ -11,7 +11,7 @@ A fully connected layer with 1024 neurons
 
 Final output layer with 38 classes (representing 38 types of plant leaf categories)
 
-With over 17 million parameters, this model was trained using the Adam optimizer and categorical cross-entropy loss, achieving ~96% accuracy on the validation set.
+With over 17 million parameters, this model was trained using the Adam optimizer and categorical cross-entropy loss, achieving ~90% accuracy on the validation set.
 
 ## AI Intregation
 But the real power unfolds after prediction.
