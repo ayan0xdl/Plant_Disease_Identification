@@ -23,7 +23,7 @@ if st.session_state.menu == "About":
     ## Welcome to BotaniQ - Your Smart Plant Doctor 
 
     Ever worried about unusual spots or patches on your plant leaves?  
-    **BotaniQ** is here to help! This intelligent assistant detects plant diseases from leaf images and provides clear, actionable treatment suggestions — instantly.
+    **BotaniQ** is here to help! This intelligent assistant detects plant diseases from leaf images and provides clear, actionable treatment suggestions instantly.
 
     ---
 
