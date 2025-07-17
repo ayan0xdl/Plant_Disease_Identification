@@ -20,7 +20,7 @@ st.session_state.menu = selected
 if st.session_state.menu == "About":
     st.image("https://images.wallpaperscraft.com/image/single/leaves_plant_green_118405_1280x720.jpg")
     st.markdown("""
-    ## 🌿 Welcome to BotaniQ - Your Smart Plant Doctor
+    ## Welcome to BotaniQ - Your Smart Plant Doctor 
 
     Ever worried about unusual spots or patches on your plant leaves?  
     **BotaniQ** is here to help! This intelligent assistant detects plant diseases from leaf images and provides clear, actionable treatment suggestions — instantly.
